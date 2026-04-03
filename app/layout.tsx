@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Official website of Legacy IEDC UCEK, the Innovation and Entrepreneurship Development Cell of University College of Engineering, Kariavattom.",
   keywords: "Legacy IEDC UCEK, UCEK, IEDC, ksum, University college of engineering Kariavattom, engineering in trivandrum, keam",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.jpeg",
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
