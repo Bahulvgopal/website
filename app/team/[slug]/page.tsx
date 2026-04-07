@@ -4,16 +4,20 @@ import { redirect } from "next/navigation";
 
 export default async function Page({
   params,
+  searchParams,
 }: {
-  params: Promise<{ oldSlug: string }>;
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ id?: string }>;
 }) {
   await connectDB();
 
-  const { oldSlug } = await params; // ✅ FIX
+  const { slug } = await params;
+  const { id } = await searchParams;
 
-  const member = await Member.findOne({
-    oldSlug,
-  }).lean();
+  // recreate old slug format → co-5
+  const oldSlug = id ? `${slug}-${id}` : slug;
+
+  const member = await Member.findOne({ oldSlug }).lean();
 
   if (member) {
     redirect(`/team/member/${member.slug}`);
