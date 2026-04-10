@@ -414,7 +414,7 @@ export default function MemberProfile({ member }: { member: any }) {
               )}
               <div className="mp-tag-strip">
                 <span className="mp-tag mp-tag-gold">✦ Member</span>
-                {member?.role && <span className="mp-tag">{member.role}</span>}
+                {/* {member?.role && <span className="mp-tag">{member.role}</span>} */}
                 {activeSocials.length > 0 && <span className="mp-tag">{activeSocials.length} Links</span>}
               </div>
             </div>
