@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 export default async function Page({
   params,
 }: {
-  params: { slug: string; id: string };
+  params: { slug: string; id: string }; // ✅ NOT Promise
 }) {
   await connectDB();
 
