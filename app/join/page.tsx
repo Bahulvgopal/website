@@ -111,7 +111,7 @@ export default function JoinPage() {
             <header className="mb-12 sm:mb-16 md:mb-20 text-center" style={{ animation: 'fadeInUp 0.8s ease-out both' }}>
               <div className="inline-block mb-4 sm:mb-6">
                 <span className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#f4b518]/10 border-2 border-[#f4b518]/30 rounded-full text-[#f4b518] text-xs sm:text-sm font-bold tracking-wider backdrop-blur-sm uppercase">
-                  ★ Be Part of the Team ★
+                  ★ Be Part of our Community ★
                 </span>
               </div>
 
@@ -154,11 +154,11 @@ export default function JoinPage() {
                   </div>
 
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-3 sm:mb-4 uppercase tracking-tight">
-                    Application Form
+                    Community Form
                   </h2>
                   
                   <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8 max-w-xl mx-auto">
-                    Fill out our application form and take the first step towards joining the Legacy IEDC family
+                    Fill out our community form and take the first step towards joining the Legacy IEDC family
                   </p>
 
                   <a
@@ -167,7 +167,7 @@ export default function JoinPage() {
                     rel="noopener noreferrer"
                     className="group inline-flex items-center gap-3 bg-gradient-to-r from-[#f4b518] to-[#ffd700] px-8 sm:px-10 md:px-12 py-3.5 sm:py-4 rounded-full font-bold text-base sm:text-lg text-black uppercase tracking-wide transition-all duration-300 hover:scale-105 shadow-[0_0_40px_rgba(244,181,24,0.4)] hover:shadow-[0_0_60px_rgba(244,181,24,0.6)]"
                   >
-                    <span>Apply Now</span>
+                    <span>Join Now</span>
                     <svg className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
