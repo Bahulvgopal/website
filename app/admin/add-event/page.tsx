@@ -55,6 +55,8 @@ export default function AddEventPage() {
     location: "",
     eventDate: "",
     registrationDeadline: "",
+    registrationType: "internal" as "internal" | "external", // 🔥 NEW
+    externalRegistrationUrl: "", // 🔥 NEW
   });
 
   const [uploading, setUploading]   = useState(false);
@@ -123,6 +125,12 @@ export default function AddEventPage() {
 
     if (!form.image) {
       alert("Please upload an event banner");
+      return;
+    }
+
+    // 🔥 NEW: validate external URL if external mode selected
+    if (form.registrationType === "external" && !form.externalRegistrationUrl.trim()) {
+      alert("Please enter the External Registration URL");
       return;
     }
 
@@ -415,6 +423,50 @@ export default function AddEventPage() {
                   onChange={(e) => setForm({ ...form, registrationDeadline: e.target.value })}
                 />
               </div>
+
+              {/* ── 🔥 NEW: Registration Type – full width ── */}
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
+                <label className="text-xs sm:text-sm font-medium text-gray-400 ml-1">
+                  Registration Type
+                </label>
+                <select
+                  value={form.registrationType}
+                  className="p-3 sm:p-3.5 rounded-xl bg-gray-800 border border-gray-700
+                             text-sm sm:text-base
+                             focus:border-yellow-500 outline-none transition-all
+                             [color-scheme:dark]"
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      registrationType: e.target.value as "internal" | "external",
+                    })
+                  }
+                >
+                  <option value="internal">Internal</option>
+                  <option value="external">External</option>
+                </select>
+              </div>
+
+              {/* ── 🔥 NEW: External Registration URL – only if External selected ── */}
+              {form.registrationType === "external" && (
+                <div className="flex flex-col gap-1.5 sm:col-span-2">
+                  <label className="text-xs sm:text-sm font-medium text-gray-400 ml-1">
+                    External Registration URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://makemypass.com/your-event"
+                    required
+                    value={form.externalRegistrationUrl}
+                    className="p-3 sm:p-3.5 rounded-xl bg-gray-800 border border-gray-700
+                               text-sm sm:text-base
+                               focus:border-yellow-500 outline-none transition-all"
+                    onChange={(e) =>
+                      setForm({ ...form, externalRegistrationUrl: e.target.value })
+                    }
+                  />
+                </div>
+              )}
             </div>
 
             {/* ── Action buttons ── */}

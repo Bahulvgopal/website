@@ -12,6 +12,8 @@ interface UpcomingEventCardProps {
     eventDate: string;
     registrationDeadline: string;
     image?: string;
+    registrationType?: "internal" | "external";
+    externalRegistrationUrl?: string;
   };
   index: number;
 }
@@ -20,7 +22,6 @@ export default function UpcomingEventCard({ event, index }: UpcomingEventCardPro
   const [isExpanded, setIsExpanded] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
 
-  // Inject keyframe animation styles once
   useEffect(() => {
     if (typeof document !== 'undefined') {
       const styleId = 'fadeInUp-animation';
@@ -44,7 +45,6 @@ export default function UpcomingEventCard({ event, index }: UpcomingEventCardPro
     }
   }, []);
 
-  // Calculate time left until event
   useEffect(() => {
     const calculateTimeLeft = () => {
       const eventDate = new Date(event.eventDate);
@@ -68,16 +68,25 @@ export default function UpcomingEventCard({ event, index }: UpcomingEventCardPro
     };
 
     calculateTimeLeft();
-    const interval = setInterval(calculateTimeLeft, 60000); // Update every minute
+    const interval = setInterval(calculateTimeLeft, 60000);
 
     return () => clearInterval(interval);
   }, [event.eventDate]);
 
   const isRegistrationOpen = new Date(event.registrationDeadline) >= new Date();
+
+  const registrationType = event.registrationType === "external" ? "external" : "internal";
+
+  const registrationHref =
+    registrationType === "external" && event.externalRegistrationUrl
+      ? event.externalRegistrationUrl
+      : `/events/register/${event._id}`;
+
+  const isExternal = registrationType === "external" && !!event.externalRegistrationUrl;
   
   return (
     <div
-      className="group relative bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-3xl overflow-hidden border border-white/5 hover:border-[#f4b518]/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(244,181,24,0.15)] hover:scale-[1.02] "
+      className="group relative bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-3xl overflow-hidden border border-white/5 hover:border-[#f4b518]/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(244,181,24,0.15)] hover:scale-[1.02]"
       style={{
         animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
       }}
@@ -87,7 +96,7 @@ export default function UpcomingEventCard({ event, index }: UpcomingEventCardPro
 
       {/* Event Image */}
       {event.image && (
-        <div className="relative w-full aspect-[4/3] overflow-hidden">
+        <div className="relative w-full aspect-[3/4] overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
           <img
             src={event.image}
@@ -177,7 +186,6 @@ export default function UpcomingEventCard({ event, index }: UpcomingEventCardPro
             </span>
           </div>
 
-          {/* Registration Deadline */}
           <div className="flex items-center gap-3 text-sm md:text-base">
             <div className="w-8 h-8 rounded-full bg-[#f4b518]/10 flex items-center justify-center flex-shrink-0">
               <svg className="w-4 h-4 text-[#f4b518]" fill="currentColor" viewBox="0 0 20 20">
@@ -196,15 +204,30 @@ export default function UpcomingEventCard({ event, index }: UpcomingEventCardPro
         {/* Registration Button or Closed Message */}
         <div className="pt-4 mt-4 border-t border-white/5">
           {isRegistrationOpen ? (
-            <Link
-              href={`/events/register/${event._id}`}
-              className="group/btn relative w-full py-4 rounded-xl font-bold text-sm uppercase tracking-widest transition-all text-center bg-[#f4b518] text-black hover:bg-white overflow-hidden flex items-center justify-center gap-2"
-            >
-              <span className="relative z-10">Register Now</span>
-              <svg className="w-4 h-4 relative z-10 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
+            isExternal ? (
+              // ✅ FIXED: was missing the opening <a tag
+              <a
+                href={registrationHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group/btn relative w-full py-4 rounded-xl font-bold text-sm uppercase tracking-widest transition-all text-center bg-[#f4b518] text-black hover:bg-white overflow-hidden flex items-center justify-center gap-2"
+              >
+                <span className="relative z-10">Register Now</span>
+                <svg className="w-4 h-4 relative z-10 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </a>
+            ) : (
+              <Link
+                href={registrationHref}
+                className="group/btn relative w-full py-4 rounded-xl font-bold text-sm uppercase tracking-widest transition-all text-center bg-[#f4b518] text-black hover:bg-white overflow-hidden flex items-center justify-center gap-2"
+              >
+                <span className="relative z-10">Register Now</span>
+                <svg className="w-4 h-4 relative z-10 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            )
           ) : (
             <div className="flex items-center justify-center gap-2 text-red-400 font-semibold uppercase tracking-wider text-xs md:text-sm py-3">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

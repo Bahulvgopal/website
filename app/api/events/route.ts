@@ -15,6 +15,8 @@ export async function POST(req: Request) {
       location,
       eventDate,
       registrationDeadline,
+      registrationType,
+      externalRegistrationUrl,
     } = body;
 
     if (
@@ -31,6 +33,20 @@ export async function POST(req: Request) {
       );
     }
 
+    // 🔥 Normalize registration type (defaults to internal)
+    const finalRegistrationType =
+      registrationType === "external" ? "external" : "internal";
+
+    if (
+      finalRegistrationType === "external" &&
+      !externalRegistrationUrl
+    ) {
+      return NextResponse.json(
+        { message: "External Registration URL is required" },
+        { status: 400 }
+      );
+    }
+
     const newEvent = await Event.create({
       title,
       description,
@@ -38,6 +54,11 @@ export async function POST(req: Request) {
       location,
       eventDate,
       registrationDeadline,
+      registrationType: finalRegistrationType,
+      externalRegistrationUrl:
+        finalRegistrationType === "external"
+          ? externalRegistrationUrl
+          : "",
     });
 
     return NextResponse.json(newEvent);

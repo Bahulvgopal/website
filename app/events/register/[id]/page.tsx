@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -18,6 +18,37 @@ export default function RegisterPage() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 🔥 NEW: checking event type before showing the internal form
+  const [checkingEvent, setCheckingEvent] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+
+    async function checkEventType() {
+      try {
+        const res = await fetch(`/api/events/${id}`);
+        if (!res.ok) {
+          setCheckingEvent(false);
+          return;
+        }
+        const event = await res.json();
+
+        if (event.registrationType === "external" && event.externalRegistrationUrl) {
+          // Redirect straight to the external registration page
+          window.location.href = event.externalRegistrationUrl;
+          return;
+        }
+
+        setCheckingEvent(false);
+      } catch (err) {
+        console.error(err);
+        setCheckingEvent(false);
+      }
+    }
+
+    checkEventType();
+  }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +74,15 @@ export default function RegisterPage() {
       setIsSubmitting(false);
     }
   };
+
+  // 🔥 NEW: brief loading state while we check registration type
+  if (checkingEvent) {
+    return (
+      <main className="min-h-screen bg-[#f4b518] flex items-center justify-center p-4">
+        <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#f4b518] flex items-center justify-center p-4 relative overflow-hidden">

@@ -68,6 +68,10 @@ export default async function UpcomingEventsPage() {
                     eventDate: event.eventDate.toISOString(),
                     registrationDeadline: event.registrationDeadline.toISOString(),
                     image: event.image,
+                    // 🔥 NEW: default to internal for legacy events
+                    registrationType:
+                      event.registrationType === "external" ? "external" : "internal",
+                    externalRegistrationUrl: event.externalRegistrationUrl || "",
                   }} 
                   index={index} 
                 />

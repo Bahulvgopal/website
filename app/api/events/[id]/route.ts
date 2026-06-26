@@ -51,9 +51,32 @@ export async function PUT(
     );
   }
 
+  // 🔥 Normalize registration type before saving
+  const finalRegistrationType =
+    body.registrationType === "external" ? "external" : "internal";
+
+  if (
+    finalRegistrationType === "external" &&
+    !body.externalRegistrationUrl
+  ) {
+    return NextResponse.json(
+      { message: "External Registration URL is required" },
+      { status: 400 }
+    );
+  }
+
+  const updatePayload = {
+    ...body,
+    registrationType: finalRegistrationType,
+    externalRegistrationUrl:
+      finalRegistrationType === "external"
+        ? body.externalRegistrationUrl
+        : "",
+  };
+
   const updated = await Event.findByIdAndUpdate(
     id,
-    body,
+    updatePayload,
     { returnDocument: "after" }
   );
 
@@ -79,10 +102,8 @@ export async function DELETE(
 
   const eventId = new mongoose.Types.ObjectId(id);
 
-  // Delete registrations first
   await Registration.deleteMany({ eventId });
 
-  // Delete event
   const deleted = await Event.findByIdAndDelete(eventId);
 
   if (!deleted) {
