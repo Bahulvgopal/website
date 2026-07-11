@@ -1,5 +1,31 @@
 import mongoose, { Schema, models, model } from "mongoose";
 
+/* ===========================
+   Team Member Schema
+=========================== */
+const TeamMemberSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+
+    department: {
+      type: String,
+      required: true,
+    },
+
+    year: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: false }
+);
+
+/* ===========================
+   Registration Schema
+=========================== */
 const RegistrationSchema = new Schema(
   {
     eventId: {
@@ -7,29 +33,65 @@ const RegistrationSchema = new Schema(
       ref: "Event",
       required: true,
     },
+
+    // ===========================
+    // Event Type
+    // ===========================
+
+    isTeam: {
+      type: Boolean,
+      default: false,
+    },
+
+    teamName: {
+      type: String,
+      default: "",
+    },
+
+    // ===========================
+    // Team Leader / Solo Participant
+    // (Existing fields retained)
+    // ===========================
+
     name: {
       type: String,
       required: true,
     },
+
     email: {
       type: String,
       required: true,
     },
+
     phone: {
       type: String,
       required: true,
     },
+
     department: {
       type: String,
       required: true,
     },
+
     year: {
       type: String,
       required: true,
     },
-    description: {          // ✅ NEW FIELD
+
+    description: {
       type: String,
-      required: false,      // make true if mandatory
+      default: "",
+    },
+
+    // ===========================
+    // Additional Team Members
+    // Leader is stored above.
+    // This array stores Member 2 onwards.
+    // ===========================
+
+    members: {
+      type: [TeamMemberSchema],
+      default: [],
     },
   },
   { timestamps: true }

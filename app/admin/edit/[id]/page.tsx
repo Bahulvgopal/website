@@ -67,9 +67,14 @@ export default function EditEventPage() {
     location: "",
     eventDate: "",
     registrationDeadline: "",
-    registrationType: "internal" as "internal" | "external", // 🔥 NEW
-    externalRegistrationUrl: "", // 🔥 NEW
-  });
+
+    registrationType: "internal" as "internal" | "external",
+    externalRegistrationUrl: "",
+
+    eventMode: "solo" as "solo" | "team",
+    minTeamMembers: 2,
+    maxTeamMembers: 2,
+});
 
   /* --- Crop state --- */
   const [rawImage, setRawImage]                     = useState<string | null>(null);
@@ -94,12 +99,29 @@ export default function EditEventPage() {
           image: event.image || "",
           location: event.location || "",
           eventDate: event.eventDate?.slice(0, 10) || "",
-          registrationDeadline: event.registrationDeadline?.slice(0, 10) || "",
-          // 🔥 NEW: default to internal for legacy events without this field
+          registrationDeadline:
+            event.registrationDeadline?.slice(0, 10) || "",
+
           registrationType:
-            event.registrationType === "external" ? "external" : "internal",
-          externalRegistrationUrl: event.externalRegistrationUrl || "",
+            event.registrationType === "external"
+              ? "external"
+              : "internal",
+
+          externalRegistrationUrl:
+            event.externalRegistrationUrl || "",
+
+          eventMode:
+            event.eventMode === "team"
+              ? "team"
+              : "solo",
+
+          minTeamMembers:
+            event.minTeamMembers ?? 2,
+
+          maxTeamMembers:
+            event.maxTeamMembers ?? 2,
         });
+
       } catch (err) {
         console.error(err);
         alert("Could not load event.");
@@ -171,6 +193,19 @@ export default function EditEventPage() {
       alert("Please enter the External Registration URL");
       return;
     }
+
+    if (form.eventMode === "team") {
+
+  if (form.minTeamMembers < 2) {
+    alert("Minimum team members must be at least 2.");
+    return;
+  }
+
+  if (form.maxTeamMembers < form.minTeamMembers) {
+    alert("Maximum team members cannot be less than minimum team members.");
+    return;
+  }
+}
 
     try {
       setSubmitting(true);
@@ -480,6 +515,70 @@ export default function EditEventPage() {
                       />
                     </div>
                   )}
+                  {/* Participation Type */}
+<div className="space-y-2">
+  <label className="text-xs font-bold text-[#f4b518] uppercase tracking-widest ml-1">
+    Participation Type
+  </label>
+
+  <select
+    value={form.eventMode}
+    className="w-full p-4 bg-black border border-zinc-800 rounded-2xl focus:border-[#f4b518] outline-none transition-all"
+    onChange={(e) =>
+      setForm({
+        ...form,
+        eventMode: e.target.value as "solo" | "team",
+      })
+    }
+  >
+    <option value="solo">Solo Event</option>
+    <option value="team">Team Event</option>
+  </select>
+</div>
+
+{form.eventMode === "team" && (
+  <div className="grid grid-cols-2 gap-4">
+
+    <div className="space-y-2">
+      <label className="text-xs font-bold text-[#f4b518] uppercase tracking-widest ml-1">
+        Minimum Members
+      </label>
+
+      <input
+        type="number"
+        min={2}
+        value={form.minTeamMembers}
+        className="w-full p-4 bg-black border border-zinc-800 rounded-2xl focus:border-[#f4b518] outline-none"
+        onChange={(e)=>
+          setForm({
+            ...form,
+            minTeamMembers:Number(e.target.value)
+          })
+        }
+      />
+    </div>
+
+    <div className="space-y-2">
+      <label className="text-xs font-bold text-[#f4b518] uppercase tracking-widest ml-1">
+        Maximum Members
+      </label>
+
+      <input
+        type="number"
+        min={form.minTeamMembers}
+        value={form.maxTeamMembers}
+        className="w-full p-4 bg-black border border-zinc-800 rounded-2xl focus:border-[#f4b518] outline-none"
+        onChange={(e)=>
+          setForm({
+            ...form,
+            maxTeamMembers:Number(e.target.value)
+          })
+        }
+      />
+    </div>
+
+  </div>
+)}
                 </div>
 
                 {/* Actions */}

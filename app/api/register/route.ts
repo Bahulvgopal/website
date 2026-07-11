@@ -10,6 +10,13 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
+    if (!mongoose.Types.ObjectId.isValid(body.eventId)) {
+      return NextResponse.json(
+        { error: "Invalid Event ID" },
+        { status: 400 }
+      );
+    }
+
     const event = await Event.findById(
       new mongoose.Types.ObjectId(body.eventId)
     );
@@ -21,12 +28,13 @@ export async function POST(req: Request) {
       );
     }
 
-    const now = new Date();
+    // ==========================
+    // Registration Deadline
+    // ==========================
 
-    // 🚨 Deadline check
     if (
       event.registrationDeadline &&
-      new Date(event.registrationDeadline) < now
+      new Date(event.registrationDeadline) < new Date()
     ) {
       return NextResponse.json(
         { error: "Registration closed" },
@@ -34,19 +42,142 @@ export async function POST(req: Request) {
       );
     }
 
-    const registration = await Registration.create({
-      ...body,
-      eventId: new mongoose.Types.ObjectId(body.eventId),
-    });
+    // ==========================
+    // Team Validation
+    // ==========================
+
+    if (event.eventMode === "team") {
+
+      if (!body.isTeam) {
+        return NextResponse.json(
+          {
+            error: "This event requires team registration.",
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+
+      if (!body.teamName?.trim()) {
+        return NextResponse.json(
+          {
+            error: "Team name is required.",
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+
+      if (!Array.isArray(body.members)) {
+        return NextResponse.json(
+          {
+            error: "Members are required.",
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+
+      const totalMembers =
+        body.members.length + 1;
+
+      if (
+        totalMembers <
+        event.minTeamMembers
+      ) {
+        return NextResponse.json(
+          {
+            error: `Minimum ${event.minTeamMembers} members required.`,
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+
+      if (
+        totalMembers >
+        event.maxTeamMembers
+      ) {
+        return NextResponse.json(
+          {
+            error: `Maximum ${event.maxTeamMembers} members allowed.`,
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+
+      for (const member of body.members) {
+        if (
+          !member.name ||
+          !member.department ||
+          !member.year
+        ) {
+          return NextResponse.json(
+            {
+              error:
+                "All team member details are required.",
+            },
+            {
+              status: 400,
+            }
+          );
+        }
+      }
+    }
+
+    // ==========================
+    // Create Registration
+    // ==========================
+
+    const registration =
+      await Registration.create({
+        eventId:
+          new mongoose.Types.ObjectId(
+            body.eventId
+          ),
+
+        isTeam:
+          event.eventMode === "team",
+
+        teamName:
+          body.teamName || "",
+
+        name: body.name,
+        email: body.email,
+        phone: body.phone,
+        department: body.department,
+        year: body.year,
+        description:
+          body.description || "",
+
+        members:
+          body.members || [],
+      });
 
     return NextResponse.json({
-      message: "Registration Successful 🚀",
+      message:
+        "Registration Successful 🚀",
       registration,
     });
+
   } catch (error) {
+
+    console.error(error);
+
     return NextResponse.json(
-      { error: "Registration Failed" },
-      { status: 500 }
+      {
+        error:
+          "Registration Failed",
+      },
+      {
+        status: 500,
+      }
     );
   }
 }

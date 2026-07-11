@@ -55,9 +55,15 @@ export default function AddEventPage() {
     location: "",
     eventDate: "",
     registrationDeadline: "",
-    registrationType: "internal" as "internal" | "external", // 🔥 NEW
-    externalRegistrationUrl: "", // 🔥 NEW
-  });
+
+    registrationType: "internal" as "internal" | "external",
+    externalRegistrationUrl: "",
+
+    // NEW
+    eventMode: "solo" as "solo" | "team",
+    minTeamMembers: 2,
+    maxTeamMembers: 2,
+});
 
   const [uploading, setUploading]   = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -134,6 +140,18 @@ export default function AddEventPage() {
       return;
     }
 
+    if (form.eventMode === "team") {
+
+  if (form.minTeamMembers < 2) {
+    alert("Minimum team members must be at least 2.");
+    return;
+  }
+
+  if (form.maxTeamMembers < form.minTeamMembers) {
+    alert("Maximum team members cannot be less than minimum team members.");
+    return;
+  }
+}
     try {
       setSubmitting(true);
       const res = await fetch("/api/events", {
@@ -467,6 +485,76 @@ export default function AddEventPage() {
                   />
                 </div>
               )}
+
+              {/* Participation Type */}
+<div className="flex flex-col gap-1.5 sm:col-span-2">
+  <label className="text-xs sm:text-sm font-medium text-gray-400 ml-1">
+    Participation Type
+  </label>
+
+  <select
+    value={form.eventMode}
+    className="p-3 sm:p-3.5 rounded-xl bg-gray-800 border border-gray-700
+    text-sm sm:text-base
+    focus:border-yellow-500 outline-none transition-all
+    [color-scheme:dark]"
+    onChange={(e) =>
+      setForm({
+        ...form,
+        eventMode: e.target.value as "solo" | "team",
+      })
+    }
+  >
+    <option value="solo">Solo Event</option>
+    <option value="team">Team Event</option>
+  </select>
+</div>
+
+{form.eventMode === "team" && (
+  <>
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs sm:text-sm font-medium text-gray-400 ml-1">
+        Minimum Team Members
+      </label>
+
+      <input
+        type="number"
+        min={2}
+        value={form.minTeamMembers}
+        className="p-3 sm:p-3.5 rounded-xl bg-gray-800 border border-gray-700
+        text-sm sm:text-base
+        focus:border-yellow-500 outline-none transition-all"
+        onChange={(e) =>
+          setForm({
+            ...form,
+            minTeamMembers: Number(e.target.value),
+          })
+        }
+      />
+    </div>
+
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs sm:text-sm font-medium text-gray-400 ml-1">
+        Maximum Team Members
+      </label>
+
+      <input
+        type="number"
+        min={form.minTeamMembers}
+        value={form.maxTeamMembers}
+        className="p-3 sm:p-3.5 rounded-xl bg-gray-800 border border-gray-700
+        text-sm sm:text-base
+        focus:border-yellow-500 outline-none transition-all"
+        onChange={(e) =>
+          setForm({
+            ...form,
+            maxTeamMembers: Number(e.target.value),
+          })
+        }
+      />
+    </div>
+  </>
+)}
             </div>
 
             {/* ── Action buttons ── */}
