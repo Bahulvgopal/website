@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 const stats = [
-  { label: "Established", value: "2021" },
+  { label: "Established", value: "2020" },
   { label: "IN TVM", value: "# 1" },
   { label: "IN SOUTH ZONE", value: "# 2" },
   { label: "IN ALL KERALA", value: "# 14" },
